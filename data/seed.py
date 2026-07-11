@@ -184,7 +184,7 @@ def seed_patients(session):
         session.run(
             """
             MERGE (p:Patient {id: $id})
-            SET p.name = $name, p.phone = $phone
+            SET p.name = $name, p.phone = $phone, p.age = $age, p.gender = $gender
             WITH p
             MATCH (loc:Location {id: $location}), (cert:Certification {id: $cert}),
                   (l:Language {code: $lang})
@@ -192,8 +192,25 @@ def seed_patients(session):
             MERGE (p)-[:REQUIRES]->(cert)
             MERGE (p)-[:PREFERS]->(l)
             """,
-            id=pt["id"], name=pt["name"], phone=pt["phone"], location=pt["location"],
+            id=pt["id"], name=pt["name"], phone=pt["phone"], age=pt["age"],
+            gender=pt["gender"], location=pt["location"],
             cert=pt["requires_cert"], lang=pt["prefers_language"],
+        )
+
+
+def seed_medications(session):
+    for med in MEDICATIONS:
+        session.run(
+            """
+            MATCH (p:Patient {id: $patient})
+            CREATE (m:Medication {
+                name: $name, dose: $dose, schedule: $schedule,
+                route: $route, active: $active
+            })
+            MERGE (p)-[:HAS_MEDICATION]->(m)
+            """,
+            patient=med["patient"], name=med["name"], dose=med["dose"],
+            schedule=med["schedule"], route=med["route"], active=med["active"],
         )
 
 
@@ -229,6 +246,7 @@ def run():
         seed_locations(session)
         seed_caregivers(session)
         seed_patients(session)
+        seed_medications(session)
         seed_shifts(session)
     print("Seed complete: "
           f"{len(CAREGIVERS)} caregivers, {len(PATIENTS)} patients, {len(SHIFTS)} shifts.")
