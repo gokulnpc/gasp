@@ -35,6 +35,7 @@ Start here → [`docs/README.md`](./docs/README.md) (navigation hub + reading pa
 | Roadmap & execution | [`docs/07-roadmap-execution-plan.md`](./docs/07-roadmap-execution-plan.md) | Build order (M0–M8), risks, demo script |
 | Glossary | [`docs/08-glossary.md`](./docs/08-glossary.md) | Any unfamiliar term or acronym |
 | Work split (4-person) | [`docs/09-work-split.md`](./docs/09-work-split.md) | Who owns what + a per-person build prompt |
+| Architecture diagrams | [`docs/diagrams/README.md`](./docs/diagrams/README.md) | Importable draw.io files (master + dual-agent + 4 SubWorkflows + data layer) |
 
 ## Key facts to keep in context
 

@@ -22,6 +22,7 @@ folder.
 | 07 | [Roadmap & Execution Plan](./07-roadmap-execution-plan.md) | What we build first and how we demo it |
 | 08 | [Glossary](./08-glossary.md) | Every term and acronym in one place |
 | 09 | [Work Split](./09-work-split.md) | The 4-person build division + a prompt per person |
+| — | [Diagrams](./diagrams/README.md) | Importable draw.io architecture diagrams (master + per-SubWorkflow) |
 
 ## Suggested reading paths
 
