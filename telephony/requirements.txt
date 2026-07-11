@@ -1,0 +1,6 @@
+# Person 1 · Telephony & Voice I/O
+# Python 3.10+
+livekit-agents[elevenlabs,silero]>=1.0
+livekit-api>=1.0
+twilio>=9.0
+python-dotenv>=1.0
