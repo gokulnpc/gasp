@@ -21,6 +21,7 @@ folder.
 | 06 | [Non-Functional Requirements](./06-non-functional-requirements.md) | Latency, compliance, reliability, security |
 | 07 | [Roadmap & Execution Plan](./07-roadmap-execution-plan.md) | What we build first and how we demo it |
 | 08 | [Glossary](./08-glossary.md) | Every term and acronym in one place |
+| 09 | [Work Split](./09-work-split.md) | The 4-person build division + a prompt per person |
 
 ## Suggested reading paths
 

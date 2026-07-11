@@ -34,6 +34,7 @@ Start here → [`docs/README.md`](./docs/README.md) (navigation hub + reading pa
 | Non-functional reqs | [`docs/06-non-functional-requirements.md`](./docs/06-non-functional-requirements.md) | Latency, HIPAA/PHI, reliability, security, i18n |
 | Roadmap & execution | [`docs/07-roadmap-execution-plan.md`](./docs/07-roadmap-execution-plan.md) | Build order (M0–M8), risks, demo script |
 | Glossary | [`docs/08-glossary.md`](./docs/08-glossary.md) | Any unfamiliar term or acronym |
+| Work split (4-person) | [`docs/09-work-split.md`](./docs/09-work-split.md) | Who owns what + a per-person build prompt |
 
 ## Key facts to keep in context
 
