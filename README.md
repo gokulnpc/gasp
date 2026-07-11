@@ -51,6 +51,12 @@ The four specialized workflows in detail.
 
 ![Interpreter and escalation bridge](sw4.png)
 
+The data safety layer that wraps every read and write of patient information.
+
+**PHI Guardrail Layer: Disclosure and Ingestion Gates**
+
+![PHI guardrail layer](guardrail.png)
+
 ## How the whole thing works
 
 Think of it as a hub with spokes.

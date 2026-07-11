@@ -23,6 +23,7 @@ data layer.
 | 04 | [`04-sw3-medlog-compliance.drawio`](./04-sw3-medlog-compliance.drawio) | SW3 flowchart — per-med questionnaire → structured JSON → append-only audit, with sample JSON |
 | 05 | [`05-sw4-interpreter-escalation.drawio`](./05-sw4-interpreter-escalation.drawio) | SW4 flowchart — distress trigger → override → conference patch → two-way interpretation |
 | 06 | [`06-data-layer.drawio`](./06-data-layer.drawio) | Neo4j **property graph** (nodes + relationships) alongside the Calendars / Checklists / Audit stores |
+| 07 | [`07-guardrail-flow.drawio`](./07-guardrail-flow.drawio) | **PHI guardrails** — the Disclosure Gate (read) and Ingestion Gate (write) around the Passive Agent, with a production-hardening band |
 
 ## Conventions (matches the reference style)
 
