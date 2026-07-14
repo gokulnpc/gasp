@@ -12,9 +12,10 @@ from __future__ import annotations
 
 from typing import Optional
 
-from livekit.agents import Agent, RunContext, function_tool, llm
+from livekit.agents import RunContext, function_tool, llm
 
 import override
+from gasp_agent import GaspAgent
 from data import api as data
 from state import CallState
 from subworkflows.base import VOICE_RULES
@@ -40,7 +41,7 @@ need, and route them.
 """
 
 
-class OrchestratorAgent(Agent):
+class OrchestratorAgent(GaspAgent):
     workflow_name = "orchestrator"
 
     def __init__(self, chat_ctx: Optional[llm.ChatContext] = None) -> None:

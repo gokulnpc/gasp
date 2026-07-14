@@ -51,6 +51,7 @@ SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "") or os.getenv("SUPABASE
 CONSOLE_CALLER_PHONE = os.getenv("CONSOLE_CALLER_PHONE", "+15550001")  # Maria in seed data
 COORDINATOR_PHONE = os.getenv("COORDINATOR_PHONE", "+15559990000")
 DEMO_FAST = os.getenv("DEMO_FAST", "true").lower() == "true"  # compress cascade waits
+PII_REDACTION_ENABLED = os.getenv("PII_REDACTION_ENABLED", "true").lower() == "true"
 
 SIM_LOG = HERE / "simulation_log.txt"
 PORTAL_LOG = HERE / "portal_summaries.jsonl"
@@ -78,4 +79,5 @@ def startup_report() -> str:
         f"  voice      : {STT_MODEL} / {LLM_MODEL}",
         f"  telephony  : {tel}",
         f"  demo_fast  : {DEMO_FAST}",
+        f"  pii_scrub  : {'on' if PII_REDACTION_ENABLED else 'off'} (LLM ingestion gate)",
     ])

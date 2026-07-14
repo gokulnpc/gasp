@@ -14,9 +14,10 @@ from __future__ import annotations
 
 from typing import Optional
 
-from livekit.agents import Agent, RunContext, function_tool, llm
+from livekit.agents import RunContext, function_tool, llm
 
 from data import api as data
+from gasp_agent import GaspAgent
 from state import CallState
 
 VOICE_RULES = (
@@ -29,7 +30,7 @@ VOICE_RULES = (
 )
 
 
-class GaspWorkflowAgent(Agent):
+class GaspWorkflowAgent(GaspAgent):
     """Base for SW1-SW4: logs enter/exit to the ledger automatically."""
 
     workflow_name: str = "SW?"
