@@ -18,7 +18,8 @@ async def main() -> None:
     if not db.configured():
         raise SystemExit("Supabase env missing")
 
-    maria = await db.caregiver_by_phone("+15550001")
+    marias = await db.select("caregivers", {"name": "ilike.*Maria*", "limit": "1"})
+    maria = marias[0] if marias else None
     shifts = await db.select("shifts", {"client_name": "eq.Mrs. Patterson", "limit": "1"})
     if not maria or not shifts:
         raise SystemExit("Seed data missing - re-run schema.sql")

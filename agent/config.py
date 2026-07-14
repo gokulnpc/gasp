@@ -29,7 +29,14 @@ for env_file in (
 LIVEKIT_URL = os.getenv("LIVEKIT_URL", "")
 LIVEKIT_API_KEY = os.getenv("LIVEKIT_API_KEY", "")
 LIVEKIT_API_SECRET = os.getenv("LIVEKIT_API_SECRET", "")
-AGENT_NAME = os.getenv("GASP_AGENT_NAME", "gasp-agent")  # SIP dispatch rule targets this later
+AGENT_NAME = os.getenv("GASP_AGENT_NAME", "gasp-agent")  # SIP dispatch rule targets this
+
+# --- Telephony (Twilio <-> LiveKit SIP; see gasp/telephony/) ---
+SIM_MODE = os.getenv("SIM_MODE", "all")
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
+TWILIO_VOICE_NUMBER = os.getenv("TWILIO_VOICE_NUMBER", "")
+SIP_OUTBOUND_TRUNK_ID = os.getenv("LIVEKIT_SIP_OUTBOUND_TRUNK_ID", "")
 
 # --- Voice pipeline models (ride on LiveKit Inference - one LIVEKIT key covers them) ---
 STT_MODEL = os.getenv("STT_MODEL", "deepgram/nova-3")
@@ -45,17 +52,30 @@ CONSOLE_CALLER_PHONE = os.getenv("CONSOLE_CALLER_PHONE", "+15550001")  # Maria i
 COORDINATOR_PHONE = os.getenv("COORDINATOR_PHONE", "+15559990000")
 DEMO_FAST = os.getenv("DEMO_FAST", "true").lower() == "true"  # compress cascade waits
 
-# Everything phone-shaped is simulated in this build (no Twilio yet).
 SIM_LOG = HERE / "simulation_log.txt"
 PORTAL_LOG = HERE / "portal_summaries.jsonl"
+
+RECORDING_DISCLOSURE = (
+    "This call may be recorded for quality and training purposes. "
+    "Hello, you've reached Sunrise Home Care. How can I help you today?"
+)
+
+
+def telephony_real() -> bool:
+    return SIM_MODE != "all" and bool(TWILIO_ACCOUNT_SID and SIP_OUTBOUND_TRUNK_ID)
 
 
 def startup_report() -> str:
     """One honest line per subsystem so you instantly see what's real."""
+    if telephony_real():
+        tel = f"REAL SMS+calls via {TWILIO_VOICE_NUMBER} (inbound: call that number)"
+    else:
+        tel = f"SIMULATED (sms -> {SIM_LOG.name})"
     return "\n".join([
-        f"  livekit    : {LIVEKIT_URL or 'MISSING - console mode only'}",
+        f"  livekit    : {LIVEKIT_URL or 'MISSING'}",
+        f"  agent      : {AGENT_NAME} (SIP dispatch must target this name)",
         f"  supabase   : {SUPABASE_URL if SUPABASE_URL and SUPABASE_KEY else 'MISSING - using in-memory seed'}",
         f"  voice      : {STT_MODEL} / {LLM_MODEL}",
-        f"  telephony  : SIMULATED (sms -> {SIM_LOG.name})",
+        f"  telephony  : {tel}",
         f"  demo_fast  : {DEMO_FAST}",
     ])

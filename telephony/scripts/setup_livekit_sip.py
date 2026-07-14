@@ -74,6 +74,11 @@ async def main() -> None:
                             room_prefix=ROOM_PREFIX,
                         )
                     ),
+                    room_config=api.RoomConfiguration(
+                        agents=[api.RoomAgentDispatch(
+                            agent_name=os.getenv("GASP_AGENT_NAME", "gasp-agent"),
+                        )],
+                    ),
                 )
             )
             print(f"created dispatch rule: {rule.sip_dispatch_rule_id} (rooms: {ROOM_PREFIX}*)")

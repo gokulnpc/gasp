@@ -14,8 +14,9 @@ from __future__ import annotations
 
 from typing import Optional
 
-from livekit.agents import Agent, llm
+from livekit.agents import Agent, RunContext, function_tool, llm
 
+from data import api as data
 from state import CallState
 
 VOICE_RULES = (
@@ -23,6 +24,8 @@ VOICE_RULES = (
     "sentences, no lists or markdown, say times naturally ('ten A M'). "
     "If the caller switches topic mid-flow, acknowledge it, use your finish "
     "tool to hand control back, and never drop the call. "
+    "If the caller is not identified yet, ask for their name and use "
+    "identify_by_name - do NOT ask for employee IDs or repeat the question. "
 )
 
 
@@ -38,6 +41,20 @@ class GaspWorkflowAgent(Agent):
     @property
     def call_state(self) -> CallState:
         return self.session.userdata
+
+    @function_tool
+    async def identify_by_name(self, context: RunContext, name: str):
+        """Identify the caller by (partial) name when their phone number was
+        not recognized. Works with just a first name if it's unambiguous."""
+        state: CallState = context.userdata
+        caller = await data.get_caller_by_name(name)
+        if not caller:
+            return {"found": False,
+                    "hint": "no unique match - ask for their full name"}
+        state.caller = caller
+        state.log(self.workflow_name.split("-")[0].lower(),
+                  "caller_identified_by_name", caller["name"])
+        return {"found": True, "name": caller["name"], "id": caller["id"]}
 
     async def on_enter(self) -> None:
         state = self.call_state

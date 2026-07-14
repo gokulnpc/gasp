@@ -86,6 +86,32 @@ async def get_caller_by_phone(phone: str) -> Optional[dict[str, Any]]:
     return None
 
 
+async def get_caller_by_name(name: str) -> Optional[dict[str, Any]]:
+    """Fuzzy caregiver lookup for callers whose number we don't recognize.
+    Tries the full name, then each word ('Maria, New York' still finds
+    Maria Lopez). Returns the single best match or None if ambiguous."""
+    tokens = [t.strip(" ,.").lower() for t in name.split() if len(t.strip(" ,.")) > 2]
+    candidates = [name.strip().lower()] + tokens
+    if await _db_ready():
+        for cand in candidates:
+            try:
+                rows = await db.select(
+                    "caregivers",
+                    {"name": f"ilike.*{cand}*", "active": "eq.true", "limit": "2"},
+                )
+            except Exception as exc:
+                log.warning("name lookup failed: %s", exc)
+                return None
+            if len(rows) == 1:
+                return _fmt_caregiver(rows[0])
+        return None
+    for cand in candidates:
+        hits = [cg for cg in _caregivers.values() if cand in cg["name"].lower()]
+        if len(hits) == 1:
+            return dict(hits[0])
+    return None
+
+
 async def upcoming_shifts(caregiver_id: str) -> list[dict[str, Any]]:
     if await _db_ready():
         return [_fmt_shift(s) for s in await db.upcoming_shifts(caregiver_id)]
@@ -96,10 +122,33 @@ async def upcoming_shifts(caregiver_id: str) -> list[dict[str, Any]]:
 
 async def get_shift(shift_id: str) -> Optional[dict[str, Any]]:
     if await _db_ready():
-        rows = await db.select("shifts", {"id": f"eq.{shift_id}", "limit": "1"})
+        try:
+            rows = await db.select("shifts", {"id": f"eq.{shift_id}", "limit": "1"})
+        except Exception:
+            # LLM sometimes passes junk ("the ten AM shift") - not a uuid.
+            # Postgres rejects it; treat as not-found so callers can recover.
+            return None
         return _fmt_shift(rows[0]) if rows else None
     s = _shifts.get(shift_id)
     return _fmt_shift(s) if s else None
+
+
+async def resolve_shift(shift_ref: str, caregiver_id: str | None) -> Optional[dict[str, Any]]:
+    """Resolve a spoken shift reference to a real row. Exact id first, then
+    fuzzy match on the caregiver's upcoming shifts by client name; if they
+    have exactly one open shift, that's the one they mean."""
+    shift = await get_shift(shift_ref)
+    if shift:
+        return shift
+    if not caregiver_id:
+        return None
+    shifts = await upcoming_shifts(caregiver_id)
+    if len(shifts) == 1:
+        return shifts[0]
+    ref = shift_ref.lower()
+    matches = [s for s in shifts
+               if s["client_name"] and s["client_name"].lower().split()[-1] in ref]
+    return matches[0] if len(matches) == 1 else None
 
 
 async def update_shift(shift_id: str, patch: dict[str, Any]) -> dict[str, Any]:

@@ -25,7 +25,9 @@ You are the front door for every call: recognize the caller, find out what they
 need, and route them.
 
 1. Use identify_caller FIRST - you already have their number - then greet by name.
-   If unknown, ask who they are.
+   If the number is unknown, ask their name ONCE and use identify_by_name
+   (a first name is enough). Never ask for employee IDs or full legal names.
+   Identification must not block an urgent request - route first, identify after.
 2. Detect what they need and route with exactly one tool:
    - can't make / cancelling a shift        -> route_shift_callout
    - closing out a shift / logging meds     -> route_medlog
@@ -52,8 +54,16 @@ class OrchestratorAgent(Agent):
         state = self.call_state
         if not state.transcript:
             state.log("orchestrator", "call_answered", state.caller_phone)
-            prompt = ("Greet the caller: this is Ava at Sunrise Home Care. "
-                      "Use identify_caller, greet them by name, ask how you can help.")
+            if state.room_name.startswith("call"):
+                prompt = (
+                    "This is a live phone call. FIRST say the recording disclosure: "
+                    "'This call may be recorded for quality and training purposes.' "
+                    "THEN greet: this is Ava at Sunrise Home Care. "
+                    "Use identify_caller, greet by name, ask how you can help."
+                )
+            else:
+                prompt = ("Greet the caller: this is Ava at Sunrise Home Care. "
+                          "Use identify_caller, greet them by name, ask how you can help.")
         else:
             prompt = ("The previous task is wrapped up. Briefly ask if there is "
                       "anything else you can help with.")
@@ -68,11 +78,26 @@ class OrchestratorAgent(Agent):
         caller = await data.get_caller_by_phone(state.caller_phone)
         if not caller:
             state.log("orchestrator", "caller_unknown", state.caller_phone)
-            return {"found": False, "phone": state.caller_phone}
+            return {"found": False, "phone": state.caller_phone,
+                    "next": "ask their name once, then use identify_by_name"}
         state.caller = caller
         state.log("orchestrator", "caller_identified", caller["name"])
         return {"found": True, "name": caller["name"],
                 "languages": caller["languages"]}
+
+    @function_tool
+    async def identify_by_name(self, context: RunContext, name: str):
+        """Identify the caller by (partial) name when their number isn't in the
+        system. Works with just a first name if it's unambiguous."""
+        state: CallState = context.userdata
+        caller = await data.get_caller_by_name(name)
+        if not caller:
+            state.log("orchestrator", "name_lookup_failed", name)
+            return {"found": False,
+                    "hint": "no unique match - continue helping them anyway"}
+        state.caller = caller
+        state.log("orchestrator", "caller_identified_by_name", caller["name"])
+        return {"found": True, "name": caller["name"], "id": caller["id"]}
 
     @function_tool
     async def get_state_snapshot(self, context: RunContext):

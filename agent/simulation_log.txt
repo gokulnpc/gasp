@@ -1,0 +1,33 @@
+[15:39:05] SMS ->    +15559990000: URGENT escalation: Caller Maria Lopez has a fever and cannot make her ten AM shift with Mrs. Patterson today.
+[15:39:05] PATCH ->  +15559990000 into console: emergency escalation patch-in
+[15:45:29] SMS ->    +15559990000: URGENT escalation: caller said: Because I am actually fill off on my subway. My arm is kind of bleeding now. So I might need to go to hospital myself.
+[15:45:29] PATCH ->  +15559990000 into console: emergency escalation patch-in
+[15:45:37] SMS ->    +15550002: Sunrise Home Care: open shift with Mrs. Patterson (2026-07-11T10:00:00+00:00). Reply YES to take it.
+[15:45:37] SMS ->    +15550003: Sunrise Home Care: open shift with Mrs. Patterson (2026-07-11T10:00:00+00:00). Reply YES to take it.
+[15:45:43] SMS ->    +15550003: Shift filled - thanks anyway!
+[15:45:43] SMS ->    +15550004: Shift filled - thanks anyway!
+[15:45:43] SMS ->    +15550002: Confirmed: Mrs. Patterson shift is yours.
+[15:48:38] SMS ->    +15559990000: URGENT escalation: caller said: I think the ten AM shift was today. So, yeah, I have an appointment at ten AM. Currently, it's eight AM, so it's kind of emergency. And, also, I won't be available because I fell out of a subway My arm is bleeding badly, and I may need to go to So I won't be able to attend just you this in case if it's needed.
+[15:48:38] PATCH ->  +15559990000 into console: emergency escalation patch-in
+[15:49:06] SMS ->    +15559990000: Escalation resolved: coordinator took over
+[15:56:29] SMS ->    +15559990000: URGENT escalation: caller said: I think yeah. Yeah. There is a shift. I think it might not be updated well, but is a shift. And why I'm not coming is because I out of my subway and in my I'm like my arm is bleeding badly. I think I might need to go to hospital so that why I won't be able to fill up the shift or ten AM. Today.
+[15:56:29] PATCH ->  +15559990000 into console: emergency escalation patch-in
+[16:20:02] SMS ->    +15559990000: test
+[16:28:13] SMS ->    +15559990000: URGENT escalation: caller said: Yes. I felt I felt on. I I fainted because I was feeling bad, and I need to go to the hospital.
+[16:28:13] CALL ->   +15559990000 room=call-_+19295614558_o5UznoEdTSYv: emergency escalation patch-in
+[16:28:18] SMS ->    +15550002: Sunrise Home Care: open shift with Mrs. Patterson (2026-07-11T10:00:00+00:00). Reply YES to take it.
+[16:28:18] SMS ->    +15550003: Sunrise Home Care: open shift with Mrs. Patterson (2026-07-11T10:00:00+00:00). Reply YES to take it.
+[16:28:22] SMS ->    +15550003: Shift filled - thanks anyway!
+[16:28:22] SMS ->    +15550004: Shift filled - thanks anyway!
+[16:28:22] SMS ->    +15550002: Confirmed: Mrs. Patterson shift is yours.
+[16:28:38] SMS ->    +15559990000: Escalation resolved: caller safe
+[16:31:36] SMS ->    +15550002: Sunrise Home Care: open shift with Mrs. Patterson (2026-07-11T10:00:00+00:00). Reply YES to take it.
+[16:31:36] SMS ->    +15550003: Sunrise Home Care: open shift with Mrs. Patterson (2026-07-11T10:00:00+00:00). Reply YES to take it.
+[16:31:40] SMS ->    +15550003: Shift filled - thanks anyway!
+[16:31:40] SMS ->    +15550004: Shift filled - thanks anyway!
+[16:31:40] SMS ->    +15550002: Confirmed: Mrs. Patterson shift is yours.
+[16:31:42] SMS ->    +15550002: Sunrise Home Care: open shift with Mrs. Patterson (2026-07-11T10:00:00+00:00). Reply YES to take it.
+[16:31:42] SMS ->    +15550003: Sunrise Home Care: open shift with Mrs. Patterson (2026-07-11T10:00:00+00:00). Reply YES to take it.
+[16:31:46] SMS ->    +15550003: Shift filled - thanks anyway!
+[16:31:46] SMS ->    +15550004: Shift filled - thanks anyway!
+[16:31:46] SMS ->    +15550002: Confirmed: Mrs. Patterson shift is yours.

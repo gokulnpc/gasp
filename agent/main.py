@@ -1,20 +1,9 @@
 """GASP Healthcare Omni-Agent - LiveKit entry point (Person 2: Orchestrator & State).
 
-One Orchestrator answers the call, recognizes the caller, and routes into
-SubWorkflows (SW1 backfill / SW2 intake / SW3 med-log / SW4 escalation).
-A Passive ledger watches every turn off the voice path; telephony side
-effects and the data layer are simulated - no Twilio needed yet.
-
 Run it:
-  python main.py console        voice agent (mic)
+  python main.py console        voice agent (Mac mic — no phone)
+  python main.py dev            LIVE: call +1 (929) 730-7867 lands here via SIP
   python worker.py              dispatch worker (second terminal)
-  python main.py dev            LiveKit Cloud (SIP later)
-
-Demo happy path (console):
-  "I can't make my ten A M shift, I have a fever"     -> SW1 + live cascade
-  "also let me close out yesterday's shift meds"      -> intent switch to SW3
-  "I fell, I'm bleeding badly"                        -> SW4 override any time
-  Ctrl+C / hang up                                    -> post-call summary banner
 """
 
 import logging
@@ -26,8 +15,8 @@ from livekit.plugins import noise_cancellation, silero
 from livekit.plugins.turn_detector.multilingual import MultilingualModel
 
 import summary as summary_mod
-from config import (AGENT_NAME, CONSOLE_CALLER_PHONE, LLM_MODEL, STT_MODEL,
-                    TTS_MODEL, startup_report)
+from config import (AGENT_NAME, CONSOLE_CALLER_PHONE, LLM_MODEL,
+                    STT_MODEL, TTS_MODEL, startup_report)
 from orchestrator import OrchestratorAgent
 from passive import wire_passive
 from state import CallState
@@ -35,44 +24,47 @@ from state import CallState
 logging.basicConfig(level=logging.INFO,
                     format="%(asctime)s %(name)-12s %(levelname)-7s %(message)s",
                     datefmt="%H:%M:%S")
-logging.getLogger("httpx").setLevel(logging.WARNING)  # hide REST call noise
+logging.getLogger("httpx").setLevel(logging.WARNING)
 log = logging.getLogger("main")
 
 server = AgentServer()
 
 
-def _caller_phone(ctx: JobContext) -> str:
-    """Phone of the human in the room: SIP attribute on real calls, env in console.
-
-    Console mode hands us a mock room, so only trust real string values.
-    """
+async def _caller_phone(ctx: JobContext) -> str:
+    """SIP attribute on real calls; env fallback for console."""
     try:
-        for participant in ctx.room.remote_participants.values():
-            phone = participant.attributes.get("sip.phoneNumber")
-            if isinstance(phone, str) and phone:
-                return phone
+        participant = await ctx.wait_for_participant()
+        phone = participant.attributes.get("sip.phoneNumber")
+        if isinstance(phone, str) and phone:
+            log.info("SIP caller: %s", phone)
+            return phone
     except Exception:
         pass
+    for participant in ctx.room.remote_participants.values():
+        phone = participant.attributes.get("sip.phoneNumber")
+        if isinstance(phone, str) and phone:
+            return phone
     return CONSOLE_CALLER_PHONE
 
 
-def _room_name(ctx: JobContext) -> str:
-    name = ctx.room.name
-    return name if isinstance(name, str) else "console"
+def _is_sip_call(room_name: str) -> bool:
+    return room_name.startswith("call")
 
 
 @server.rtc_session(agent_name=AGENT_NAME)
 async def entrypoint(ctx: JobContext) -> None:
-    state = CallState(
-        call_id=f"call-{uuid.uuid4().hex[:8]}",
-        caller_phone=_caller_phone(ctx),
-        room_name=_room_name(ctx),
-    )
-    log.info("call starting: %s from %s", state.call_id, state.caller_phone)
+    await ctx.connect()
+    room_name = ctx.room.name if isinstance(ctx.room.name, str) else "console"
+    sip = _is_sip_call(room_name)
 
-    # Same snappy config as the Livekit-agents project: local turn detector,
-    # preemptive generation, and short endpointing so replies come fast and
-    # barge-in stays responsive (the remote TurnDetector added a ~2.5s delay).
+    caller = await _caller_phone(ctx) if sip else CONSOLE_CALLER_PHONE
+    state = CallState(
+        call_id=room_name if sip else f"call-{uuid.uuid4().hex[:8]}",
+        caller_phone=caller,
+        room_name=room_name,
+    )
+    log.info("call starting: %s from %s (sip=%s)", state.call_id, state.caller_phone, sip)
+
     session = AgentSession(
         userdata=state,
         vad=silero.VAD.load(),
